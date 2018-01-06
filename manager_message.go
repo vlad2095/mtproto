@@ -2,9 +2,9 @@ package mtproto
 
 import (
 	"fmt"
-	"reflect"
 	"log"
 	"math/rand"
+	"reflect"
 )
 
 type Message struct {
@@ -64,7 +64,7 @@ type MessageEntity struct {
 	Offset   int32
 	Length   int32
 	Url      string
-	language string
+	Language string
 	UserID   int32
 }
 type MessageForwardHeader struct {
@@ -90,8 +90,8 @@ type MessageMediaDocument struct {
 	Document Document
 }
 type MessageReplyMarkup struct {
-
 }
+
 // NewMessage
 // input
 //	1. TL_message
@@ -237,7 +237,7 @@ func NewMessageEntity(input TL) (e *MessageEntity) {
 	case TL_messageEntityPre:
 		e.Type = MESSAGE_ENTITY_PRE
 		e.Offset, e.Length = x.Offset, x.Length
-		e.language = x.Language
+		e.Language = x.Language
 	case TL_messageEntityMentionName:
 		e.Type = MESSAGE_ENTITY_MENTION_NAME
 		e.Offset, e.Length = x.Offset, x.Length
@@ -292,7 +292,6 @@ func NewMessageMedia(input TL) interface{} {
 	return nil
 }
 
-
 func (m *MTProto) Messages_SendMessage(text string, peer TL, reply_to int32) (interface{}, error) {
 	resp := make(chan TL, 1)
 	m.queueSend <- packetToSend{
@@ -338,14 +337,17 @@ func (m *MTProto) Messages_ImportChatInvite(hash string) *Chat {
 	return nil
 }
 
-func (m *MTProto) Messages_GetHistory(inputPeer TL, limit, min_id, max_id int32) ([]Message, int32) {
+func (m *MTProto) Messages_GetHistory(inputPeer TL, offs_id, offs_date, add_offs, limit, min_id, max_id int32) ([]Message, int32) {
 	resp := make(chan TL, 1)
 	m.queueSend <- packetToSend{
 		TL_messages_getHistory{
-			Peer:  inputPeer,
-			Limit: limit,
-			Min_id: min_id,
-			Max_id: max_id,
+			Offset_id:   offs_id,
+			Offset_date: offs_date,
+			Add_offset:  add_offs,
+			Peer:        inputPeer,
+			Limit:       limit,
+			Max_id:      max_id,
+			Min_id:      min_id,
 		},
 		resp,
 	}

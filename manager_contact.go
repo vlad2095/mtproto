@@ -1,8 +1,8 @@
 package mtproto
 
 import (
-	"log"
 	"fmt"
+	"log"
 )
 
 // Contact
@@ -43,6 +43,53 @@ func NewContact(in TL) (contact *Contact) {
 		return nil
 	}
 	return
+}
+
+func (m *MTProto) Contacts_ResolveUserName(name string) ([]Channel, []User, error) {
+	resp := make(chan TL, 1)
+	m.queueSend <- packetToSend{TL_contacts_resolveUsername{
+		name},
+		resp,
+	}
+	x := <-resp
+
+	peer, ok := x.(TL_contacts_resolvedPeer)
+	if !ok {
+		log.Println(fmt.Sprintf("RPC: %#v", x))
+		return []Channel{}, []User{}, fmt.Errorf("RPC: %#v", x)
+	}
+
+	// TChats := make([]Chat, 0, len(peer.Chats))
+	TChannel := make([]Channel, 0, len(peer.Chats))
+	TUsers := make([]User, 0, len(peer.Users))
+
+	for _, v := range peer.Chats {
+		switch v.(type) {
+		// case TL_chatEmpty, TL_chat, TL_chatFull, TL_chatForbidden:
+		// 	TChats = append(
+		// 		TChats,
+		// 		*NewChat(v),
+		// 	)
+		case TL_channel, TL_channelFull, TL_channelForbidden:
+			TChannel = append(
+				TChannel,
+				*NewChannel(v),
+			)
+		}
+	}
+
+	for _, v := range peer.Users {
+		switch u := v.(type) {
+		case TL_user, TL_userEmpty:
+			TUsers = append(TUsers, *NewUser(u))
+		case TL_userProfilePhoto:
+			TUsers[len(TUsers)-1].Photo = NewUserProfilePhoto(u)
+		case TL_userStatusRecently, TL_userStatusOffline, TL_userStatusOnline, TL_userStatusLastWeek, TL_userStatusLastMonth:
+			TUsers[len(TUsers)-1].Status = NewUserStatus(u)
+		}
+	}
+
+	return TChannel, TUsers, nil
 }
 
 func (m *MTProto) Contacts_GetContacts(hash int32) ([]Contact, []User, error) {

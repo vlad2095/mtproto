@@ -3,20 +3,20 @@ package mtproto
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"fmt"
-	"time"
 	"log"
 	"reflect"
-	"encoding/hex"
+	"time"
 )
 
 func (m *MTProto) sendPacket(msg TL, resp chan TL) error {
 	obj := msg.encode()
-	if __debug & DEBUG_LEVEL_NETWORK != 0 {
+	if __debug&DEBUG_LEVEL_NETWORK != 0 {
 		log.Println("MTProto::sendPacket::", reflect.TypeOf(msg).String())
 	}
-	if __debug & DEBUG_LEVEL_NETWORK_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_NETWORK_DETAILS != 0 {
 		fmt.Println(hex.Dump(msg.encode()))
 	}
 	x := NewEncodeBuf(256)
@@ -46,7 +46,7 @@ func (m *MTProto) sendPacket(msg TL, resp chan TL) error {
 		msgKey := sha1(z.buf)[4:20]
 		aesKey, aesIV := generateAES(msgKey, m.authKey, false)
 
-		y := make([]byte, len(z.buf) + ((16 - (len(obj) % 16)) & 15))
+		y := make([]byte, len(z.buf)+((16-(len(obj)%16))&15))
 		copy(y, z.buf)
 		encryptedData, err := doAES256IGEencrypt(y, aesKey, aesIV)
 		if err != nil {
@@ -79,13 +79,13 @@ func (m *MTProto) sendPacket(msg TL, resp chan TL) error {
 	}
 
 	// minus padding
-	size := len(x.buf) / 4 - 1
+	size := len(x.buf)/4 - 1
 
 	if size < 127 {
 		x.buf[3] = byte(size)
 		x.buf = x.buf[3:]
 	} else {
-		binary.LittleEndian.PutUint32(x.buf, uint32(size << 8 | 127))
+		binary.LittleEndian.PutUint32(x.buf, uint32(size<<8|127))
 	}
 	_, err := m.conn.Write(x.buf)
 	if err != nil {
@@ -128,13 +128,13 @@ func (m *MTProto) read(stop <-chan struct{}) (interface{}, error) {
 			log.Println("read 3-bytes byte")
 			return nil, err
 		}
-		size = (int(b[0]) | int(b[1]) << 8 | int(b[2]) << 16) << 2
+		size = (int(b[0]) | int(b[1])<<8 | int(b[2])<<16) << 2
 	}
 
 	left := size
 	buf := make([]byte, size)
 	for left > 0 {
-		n, err = m.conn.Read(buf[size - left:])
+		n, err = m.conn.Read(buf[size-left:])
 		if err != nil {
 			log.Println("reading error:", size, left)
 			return nil, err
@@ -152,8 +152,8 @@ func (m *MTProto) read(stop <-chan struct{}) (interface{}, error) {
 	if binary.LittleEndian.Uint64(authKeyHash) == 0 {
 		m.msgId = dbuf.Long()
 		messageLen := dbuf.Int()
-		if int(messageLen) != dbuf.size - 20 {
-			return nil, fmt.Errorf("Message len: %d (need %d)", messageLen, dbuf.size - 20)
+		if int(messageLen) != dbuf.size-20 {
+			return nil, fmt.Errorf("Message len: %d (need %d)", messageLen, dbuf.size-20)
 		}
 		m.seqNo = 0
 
@@ -176,10 +176,10 @@ func (m *MTProto) read(stop <-chan struct{}) (interface{}, error) {
 		m.msgId = dbuf.Long()
 		m.seqNo = dbuf.Int()
 		messageLen := dbuf.Int()
-		if int(messageLen) > dbuf.size - 32 {
-			return nil, fmt.Errorf("Message len: %d (need less than %d)", messageLen, dbuf.size - 32)
+		if int(messageLen) > dbuf.size-32 {
+			return nil, fmt.Errorf("Message len: %d (need less than %d)", messageLen, dbuf.size-32)
 		}
-		if !bytes.Equal(sha1(dbuf.buf[0 : 32 + messageLen])[4:20], msgKey) {
+		if !bytes.Equal(sha1(dbuf.buf[0 : 32+messageLen])[4:20], msgKey) {
 			return nil, errors.New("Wrong msg_key")
 		}
 
@@ -192,17 +192,16 @@ func (m *MTProto) read(stop <-chan struct{}) (interface{}, error) {
 			}
 		}
 
-
 	}
 	mod := m.msgId & 3
 	if mod != 1 && mod != 3 {
 		return nil, fmt.Errorf("Wrong bits of message_id: %d", mod)
 	}
 
-	if __debug & DEBUG_LEVEL_NETWORK != 0 {
+	if __debug&DEBUG_LEVEL_NETWORK != 0 {
 		log.Println("MTProto::read::", reflect.TypeOf(data).String())
 	}
-	if __debug & DEBUG_LEVEL_NETWORK_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_NETWORK_DETAILS != 0 {
 		fmt.Println(hex.Dump([]byte(fmt.Sprintf("%v", data))))
 	}
 	return data, nil
@@ -327,7 +326,7 @@ func (m *MTProto) makeAuthKey() error {
 		m.authKey = m.authKey[1:]
 	}
 	m.authKeyHash = sha1(m.authKey)[12:20]
-	t4 := make([]byte, 32 + 1 + 8)
+	t4 := make([]byte, 32+1+8)
 	copy(t4[0:], nonceSecond)
 	t4[32] = 1
 	copy(t4[33:], sha1(m.authKey)[0:8])
@@ -338,7 +337,7 @@ func (m *MTProto) makeAuthKey() error {
 
 	// (encoding) client_DH_inner_data
 	innerData2 := (TL_client_DH_inner_data{nonceFirst, nonceServer, 0, g_b}).encode()
-	x = make([]byte, 20 + len(innerData2) + (16 - ((20 + len(innerData2)) % 16)) & 15)
+	x = make([]byte, 20+len(innerData2)+(16-((20+len(innerData2))%16))&15)
 	copy(x[0:], sha1(innerData2))
 	copy(x[20:], innerData2)
 	encryptedData2, err := doAES256IGEencrypt(x, tmpAESKey, tmpAESIV)
@@ -369,7 +368,7 @@ func (m *MTProto) makeAuthKey() error {
 		return errors.New("Handshake: Wrong new_nonce_hash1")
 	}
 
-	if __debug & DEBUG_LEVEL_NETWORK != 0 {
+	if __debug&DEBUG_LEVEL_NETWORK != 0 {
 		log.Println("MTProto::makeAuthKey::", reflect.TypeOf(data).String())
 	}
 	// (all ok)

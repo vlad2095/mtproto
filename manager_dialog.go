@@ -1,8 +1,10 @@
 package mtproto
+
 import (
-	"reflect"
 	"fmt"
+	"reflect"
 )
+
 type Dialog struct {
 	Type           string
 	Pts            int32

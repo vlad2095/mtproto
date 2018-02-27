@@ -27,7 +27,7 @@ type User struct {
 	BotInfoVersion       int32
 	BotInlinePlaceHolser string
 	RestrictionReason    string
-	TlUser	 						*TL_user
+	TlUser               *TL_user
 }
 type UserFlags struct {
 	Self           bool // flags_10?true

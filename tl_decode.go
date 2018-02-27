@@ -26,13 +26,13 @@ func (m *DecodeBuf) Long() int64 {
 	if m.err != nil {
 		return 0
 	}
-	if m.off + 8 > m.size {
+	if m.off+8 > m.size {
 		m.err = errors.New("DecodeLong")
 		return 0
 	}
-	x := int64(binary.LittleEndian.Uint64(m.buf[m.off : m.off + 8]))
+	x := int64(binary.LittleEndian.Uint64(m.buf[m.off : m.off+8]))
 	m.off += 8
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::Long::", x)
 	}
 	return x
@@ -42,13 +42,13 @@ func (m *DecodeBuf) Double() float64 {
 	if m.err != nil {
 		return 0
 	}
-	if m.off + 8 > m.size {
+	if m.off+8 > m.size {
 		m.err = errors.New("DecodeDouble")
 		return 0
 	}
-	x := math.Float64frombits(binary.LittleEndian.Uint64(m.buf[m.off : m.off + 8]))
+	x := math.Float64frombits(binary.LittleEndian.Uint64(m.buf[m.off : m.off+8]))
 	m.off += 8
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::Double::", x)
 	}
 	return x
@@ -58,13 +58,13 @@ func (m *DecodeBuf) Int() int32 {
 	if m.err != nil {
 		return 0
 	}
-	if m.off + 4 > m.size {
+	if m.off+4 > m.size {
 		m.err = errors.New("DecodeInt")
 		return 0
 	}
-	x := binary.LittleEndian.Uint32(m.buf[m.off : m.off + 4])
+	x := binary.LittleEndian.Uint32(m.buf[m.off : m.off+4])
 	m.off += 4
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::Int::", x)
 	}
 	return int32(x)
@@ -74,13 +74,13 @@ func (m *DecodeBuf) UInt() uint32 {
 	if m.err != nil {
 		return 0
 	}
-	if m.off + 4 > m.size {
+	if m.off+4 > m.size {
 		m.err = errors.New("DecodeUInt")
 		return 0
 	}
-	x := binary.LittleEndian.Uint32(m.buf[m.off : m.off + 4])
+	x := binary.LittleEndian.Uint32(m.buf[m.off : m.off+4])
 	m.off += 4
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println(fmt.Sprintf("Decode::UInt::%x", x))
 	}
 	return x
@@ -90,14 +90,14 @@ func (m *DecodeBuf) Bytes(size int) []byte {
 	if m.err != nil {
 		return nil
 	}
-	if m.off + size > m.size {
+	if m.off+size > m.size {
 		m.err = errors.New("DecodeBytes")
 		return nil
 	}
 	x := make([]byte, size)
-	copy(x, m.buf[m.off:m.off + size])
+	copy(x, m.buf[m.off:m.off+size])
 	m.off += size
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		if len(x) > 10 {
 			fmt.Println("Decode::Bytes::", len(x), x[:10], " ...")
 		} else {
@@ -114,7 +114,7 @@ func (m *DecodeBuf) StringBytes() []byte {
 	}
 	var size, padding int
 
-	if m.off + 1 > m.size {
+	if m.off+1 > m.size {
 		m.err = errors.New("DecodeStringBytes")
 		return nil
 	}
@@ -122,29 +122,29 @@ func (m *DecodeBuf) StringBytes() []byte {
 	m.off++
 	padding = (4 - ((size + 1) % 4)) & 3
 	if size == 254 {
-		if m.off + 3 > m.size {
+		if m.off+3 > m.size {
 			m.err = errors.New("DecodeStringBytes")
 			return nil
 		}
-		size = int(m.buf[m.off]) | int(m.buf[m.off + 1]) << 8 | int(m.buf[m.off + 2]) << 16
+		size = int(m.buf[m.off]) | int(m.buf[m.off+1])<<8 | int(m.buf[m.off+2])<<16
 		m.off += 3
-		padding = (4 - size % 4) & 3
+		padding = (4 - size%4) & 3
 	}
 
-	if m.off + size > m.size {
+	if m.off+size > m.size {
 		m.err = errors.New("DecodeStringBytes: Wrong size")
 		return nil
 	}
 	x := make([]byte, size)
-	copy(x, m.buf[m.off:m.off + size])
+	copy(x, m.buf[m.off:m.off+size])
 	m.off += size
 
-	if m.off + padding > m.size {
+	if m.off+padding > m.size {
 		m.err = errors.New("DecodeStringBytes: Wrong padding")
 		return nil
 	}
 	m.off += padding
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		if len(x) > 10 {
 			fmt.Println("Decode::StringBytes::", len(x), x[:10], " ...")
 		} else {
@@ -161,7 +161,7 @@ func (m *DecodeBuf) String() string {
 		return ""
 	}
 	x := string(b)
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::String::", x)
 	}
 	return x
@@ -172,11 +172,11 @@ func (m *DecodeBuf) BigInt() *big.Int {
 	if m.err != nil {
 		return nil
 	}
-	y := make([]byte, len(b) + 1)
+	y := make([]byte, len(b)+1)
 	y[0] = 0
 	copy(y[1:], b)
 	x := new(big.Int).SetBytes(y)
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::BigInt::", x)
 	}
 	return x
@@ -209,7 +209,7 @@ func (m *DecodeBuf) VectorInt() []int32 {
 		x[i] = y
 		i++
 	}
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::VectorInt::", x)
 	}
 	return x
@@ -242,7 +242,7 @@ func (m *DecodeBuf) VectorLong() []int64 {
 		x[i] = y
 		i++
 	}
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::VectorLong::", x)
 	}
 	return x
@@ -275,7 +275,7 @@ func (m *DecodeBuf) VectorString() []string {
 		x[i] = y
 		i++
 	}
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::VectorString::", x)
 	}
 	return x
@@ -288,12 +288,12 @@ func (m *DecodeBuf) Bool() bool {
 	}
 	switch constructor {
 	case crc_boolFalse:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("Decode::Bool::", false)
 		}
 		return false
 	case crc_boolTrue:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("Decode::Bool::", true)
 		}
 		return true
@@ -328,7 +328,7 @@ func (m *DecodeBuf) Vector() []TL {
 		x[i] = y
 		i++
 	}
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::Vector::", x)
 	}
 	return x
@@ -342,19 +342,19 @@ func (m *DecodeBuf) Object() (r TL) {
 	switch constructor {
 
 	case crc_resPQ:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("reqPQ", constructor)
 		}
 		r = TL_resPQ{m.Bytes(16), m.Bytes(16), m.BigInt(), m.VectorLong()}
 
 	case crc_server_DH_params_ok:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("server_DH_params_ok", constructor)
 		}
 		r = TL_server_DH_params_ok{m.Bytes(16), m.Bytes(16), m.StringBytes()}
 
 	case crc_server_DH_inner_data:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("server_DH_inner_data", constructor)
 		}
 		r = TL_server_DH_inner_data{
@@ -363,25 +363,25 @@ func (m *DecodeBuf) Object() (r TL) {
 		}
 
 	case crc_dh_gen_ok:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("dh_gen_ok", constructor)
 		}
 		r = TL_dh_gen_ok{m.Bytes(16), m.Bytes(16), m.Bytes(16)}
 
 	case crc_ping:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("ping", constructor)
 		}
 		r = TL_ping{m.Long()}
 
 	case crc_pong:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("pong", constructor)
 		}
 		r = TL_pong{m.Long(), m.Long()}
 
 	case crc_msg_container:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("msg_container", constructor)
 		}
 		size := m.Int()
@@ -397,43 +397,43 @@ func (m *DecodeBuf) Object() (r TL) {
 		r = TL_msg_container{arr}
 
 	case crc_rpc_result:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("rpc_result", constructor)
 		}
 		r = TL_rpc_result{m.Long(), m.Object()}
 
 	case crc_rpc_error:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("rpc_error", constructor)
 		}
 		r = TL_rpc_error{m.Int(), m.String()}
 
 	case crc_new_session_created:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("new_session_created", constructor)
 		}
 		r = TL_new_session_created{m.Long(), m.Long(), m.Bytes(8)}
 
 	case crc_bad_server_salt:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("bad_server_salt", constructor)
 		}
 		r = TL_bad_server_salt{m.Long(), m.Int(), m.Int(), m.Bytes(8)}
 
 	case crc_bad_msg_notification:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("bad_msg_notification", constructor)
 		}
 		r = TL_crc_bad_msg_notification{m.Long(), m.Int(), m.Int()}
 
 	case crc_msgs_ack:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("msgs_ack", constructor)
 		}
 		r = TL_msgs_ack{m.VectorLong()}
 
 	case crc_gzip_packed:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println("gzip_packed", constructor)
 		}
 		obj := make([]byte, 0, 4096)
@@ -453,7 +453,7 @@ func (m *DecodeBuf) Object() (r TL) {
 		r = d.Object()
 
 	default:
-		if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+		if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 			fmt.Println(fmt.Sprintf("default %x", constructor))
 		}
 		r = m.ObjectGenerated(constructor)
@@ -471,13 +471,13 @@ func (m *DecodeBuf) Flags() int32 {
 	if m.err != nil {
 		return 0
 	}
-	if m.off + 4 > m.size {
+	if m.off+4 > m.size {
 		m.err = errors.New("DecodeInt")
 		return 0
 	}
-	x := binary.LittleEndian.Uint32(m.buf[m.off : m.off + 4])
+	x := binary.LittleEndian.Uint32(m.buf[m.off : m.off+4])
 	m.off += 4
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::Flags::", x)
 	}
 	return int32(x)
@@ -488,17 +488,17 @@ func (m *DecodeBuf) FlaggedLong(flags, f int32) int64 {
 		return 0
 	}
 	bit := int32(1 << uint(f))
-	if flags & bit == 0 {
+	if flags&bit == 0 {
 		return 0
 	}
 
-	if m.off + 8 > m.size {
+	if m.off+8 > m.size {
 		m.err = errors.New("DecodeLong")
 		return 0
 	}
-	x := int64(binary.LittleEndian.Uint64(m.buf[m.off : m.off + 8]))
+	x := int64(binary.LittleEndian.Uint64(m.buf[m.off : m.off+8]))
 	m.off += 8
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::FlaggedLong::", x)
 	}
 	return x
@@ -509,17 +509,17 @@ func (m *DecodeBuf) FlaggedDouble(flags, f int32) float64 {
 		return 0
 	}
 	bit := int32(1 << uint(f))
-	if flags & bit == 0 {
+	if flags&bit == 0 {
 		return 0
 	}
 
-	if m.off + 8 > m.size {
+	if m.off+8 > m.size {
 		m.err = errors.New("DecodeDouble")
 		return 0
 	}
-	x := math.Float64frombits(binary.LittleEndian.Uint64(m.buf[m.off : m.off + 8]))
+	x := math.Float64frombits(binary.LittleEndian.Uint64(m.buf[m.off : m.off+8]))
 	m.off += 8
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::FlaggedDouble::", x)
 	}
 	return x
@@ -530,17 +530,17 @@ func (m *DecodeBuf) FlaggedInt(flags, f int32) int32 {
 		return 0
 	}
 	bit := int32(1 << uint(f))
-	if flags & bit == 0 {
+	if flags&bit == 0 {
 		return 0
 	}
 
-	if m.off + 4 > m.size {
+	if m.off+4 > m.size {
 		m.err = errors.New("DecodeInt")
 		return 0
 	}
-	x := binary.LittleEndian.Uint32(m.buf[m.off : m.off + 4])
+	x := binary.LittleEndian.Uint32(m.buf[m.off : m.off+4])
 	m.off += 4
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::FlaggedInt::", x)
 	}
 	return int32(x)
@@ -548,7 +548,7 @@ func (m *DecodeBuf) FlaggedInt(flags, f int32) int32 {
 
 func (m *DecodeBuf) FlaggedString(flags, f int32) string {
 	bit := int32(1 << uint(f))
-	if flags & bit == 0 {
+	if flags&bit == 0 {
 		return ""
 	}
 
@@ -557,7 +557,7 @@ func (m *DecodeBuf) FlaggedString(flags, f int32) string {
 		return ""
 	}
 	x := string(b)
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::FlaggedString::", x)
 	}
 	return x
@@ -565,7 +565,7 @@ func (m *DecodeBuf) FlaggedString(flags, f int32) string {
 
 func (m *DecodeBuf) FlaggedVector(flags, f int32) []TL {
 	bit := int32(1 << uint(f))
-	if flags & bit == 0 {
+	if flags&bit == 0 {
 		return nil
 	}
 	constructor := m.UInt()
@@ -594,7 +594,7 @@ func (m *DecodeBuf) FlaggedVector(flags, f int32) []TL {
 		x[i] = y
 		i++
 	}
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		fmt.Println("Decode::FlaggedVector::", x)
 	}
 	return x
@@ -602,7 +602,7 @@ func (m *DecodeBuf) FlaggedVector(flags, f int32) []TL {
 
 func (m *DecodeBuf) FlaggedObject(flags, f int32) (r TL) {
 	bit := int32(1 << uint(f))
-	if flags & bit == 0 {
+	if flags&bit == 0 {
 		return nil
 	}
 	constructor := m.UInt()
@@ -695,7 +695,7 @@ func (m *DecodeBuf) FlaggedObject(flags, f int32) (r TL) {
 
 func (m *DecodeBuf) FlaggedStringBytes(flags, f int32) []byte {
 	bit := int32(1 << uint(f))
-	if flags & bit == 0 {
+	if flags&bit == 0 {
 		return nil
 	}
 	if m.err != nil {
@@ -703,7 +703,7 @@ func (m *DecodeBuf) FlaggedStringBytes(flags, f int32) []byte {
 	}
 	var size, padding int
 
-	if m.off + 1 > m.size {
+	if m.off+1 > m.size {
 		m.err = errors.New("DecodeStringBytes")
 		return nil
 	}
@@ -711,30 +711,30 @@ func (m *DecodeBuf) FlaggedStringBytes(flags, f int32) []byte {
 	m.off++
 	padding = (4 - ((size + 1) % 4)) & 3
 	if size == 254 {
-		if m.off + 3 > m.size {
+		if m.off+3 > m.size {
 			m.err = errors.New("DecodeStringBytes")
 			return nil
 		}
-		size = int(m.buf[m.off]) | int(m.buf[m.off + 1]) << 8 | int(m.buf[m.off + 2]) << 16
+		size = int(m.buf[m.off]) | int(m.buf[m.off+1])<<8 | int(m.buf[m.off+2])<<16
 		m.off += 3
-		padding = (4 - size % 4) & 3
+		padding = (4 - size%4) & 3
 	}
 
-	if m.off + size > m.size {
+	if m.off+size > m.size {
 		m.err = errors.New("DecodeStringBytes: Wrong size")
 		return nil
 	}
 	x := make([]byte, size)
-	copy(x, m.buf[m.off:m.off + size])
+	copy(x, m.buf[m.off:m.off+size])
 	m.off += size
 
-	if m.off + padding > m.size {
+	if m.off+padding > m.size {
 		m.err = errors.New("DecodeStringBytes: Wrong padding")
 		return nil
 	}
 	m.off += padding
 
-	if __debug & DEBUG_LEVEL_DECODE_DETAILS != 0 {
+	if __debug&DEBUG_LEVEL_DECODE_DETAILS != 0 {
 		if len(x) > 10 {
 			fmt.Println("Decode::FlaggedStringBytes::", len(x), x[:10], " ...")
 		} else {

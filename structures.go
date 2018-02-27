@@ -10,6 +10,7 @@ type Peer struct {
 	Type string
 	ID   int32
 }
+
 func NewPeer(in TL) (p *Peer) {
 	p = new(Peer)
 	switch x := in.(type) {
@@ -31,7 +32,6 @@ type GeoPoint struct {
 	Latitude   float32
 }
 
-
 // Photo
 type Photo struct {
 	flags      int32
@@ -43,6 +43,7 @@ type Photo struct {
 	Geo        *GeoPoint
 	Sizes      []*PhotoSize
 }
+
 func NewPhoto(in TL) (photo *Photo) {
 	photo = new(Photo)
 	switch x := in.(type) {
@@ -69,6 +70,7 @@ type PhotoSize struct {
 	Height   int32
 	Size     int32
 }
+
 func NewPhotoSize(in TL) (ps *PhotoSize) {
 	ps = new(PhotoSize)
 	switch x := in.(type) {
@@ -91,7 +93,6 @@ func (p *PhotoSize) GetInputFileLocation() TL_inputFileLocation {
 	}
 }
 
-
 // Document
 type Document struct {
 	ID         int64
@@ -105,6 +106,7 @@ type Document struct {
 
 	attributes []TL // DocumentAttribute
 }
+
 func NewDocument(in TL) (d *Document) {
 	d = new(Document)
 	switch x := in.(type) {
@@ -136,6 +138,7 @@ type FileLocation struct {
 	LocalID  int32
 	Secret   int64
 }
+
 func NewFileLocation(in TL) (fl *FileLocation) {
 	fl = new(FileLocation)
 	switch x := in.(type) {
@@ -156,7 +159,3 @@ func (f *FileLocation) GetInputFileLocation() TL_inputFileLocation {
 		f.Secret,
 	}
 }
-
-
-
-

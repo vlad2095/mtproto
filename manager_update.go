@@ -1,9 +1,9 @@
 package mtproto
 
 import (
-	"reflect"
-	"log"
 	"fmt"
+	"log"
+	"reflect"
 )
 
 const (
@@ -46,24 +46,24 @@ type Update struct {
 	Flags     int32
 }
 type UpdateState struct {
-	Qts          int32
-	Pts          int32
-	Date         int32
-	Seq          int32
-	UnreadCounts int32
+	Qts            int32
+	Pts            int32
+	Date           int32
+	Seq            int32
+	UnreadCounts   int32
 	TlUpdatesState *TL_updates_state
 }
 type UpdateDifference struct {
-	Type              string
-	IsSlice           bool
-	Total             int32
-	NewMessages       []Message
-	OtherUpdates      []Update
-	Chats             []Chat
-	Channels          []Channel
-	Users             []User
-	IntermediateState UpdateState
-	Seq               int32
+	Type                string
+	IsSlice             bool
+	Total               int32
+	NewMessages         []Message
+	OtherUpdates        []Update
+	Chats               []Chat
+	Channels            []Channel
+	Users               []User
+	IntermediateState   UpdateState
+	Seq                 int32
 	TlUpdatesDifference *TL_updates_difference
 }
 type ChannelUpdateDifference struct {
@@ -190,7 +190,7 @@ func (m *MTProto) Updates_GetDifference(pts, qts, date int32) (*UpdateDifference
 	}
 	x := <-resp
 	updateDifference := new(UpdateDifference)
-	switch  u := x.(type) {
+	switch u := x.(type) {
 	case TL_updates_differenceEmpty:
 		updateDifference.Type = UPDATE_DIFFERENCE_EMPTY
 		updateDifference.IsSlice = false

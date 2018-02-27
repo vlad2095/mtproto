@@ -1,9 +1,9 @@
 package mtproto
 
 import (
+	"fmt"
 	"log"
 	"reflect"
-	"fmt"
 )
 
 const (
@@ -318,7 +318,7 @@ func (m *MTProto) Channels_JoinChannel(channelID int32, accessHash int64) {
 		log.Println(input.error_message, input.error_code)
 	default:
 
-		 log.Println(reflect.TypeOf(input))
+		log.Println(reflect.TypeOf(input))
 	}
 	return
 }

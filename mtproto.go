@@ -3,14 +3,14 @@ package mtproto
 import (
 	"errors"
 	"fmt"
+	"log"
 	"math/rand"
 	"net"
 	"os"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
-	"strings"
-	"log"
 )
 
 const (
@@ -25,8 +25,8 @@ var (
 )
 
 type MTProto struct {
-	appId			int64
-	appHash		string
+	appId     int64
+	appHash   string
 	addr      string
 	conn      *net.TCPConn
 	f         *os.File
@@ -204,7 +204,7 @@ func (m *MTProto) Disconnect() error {
 	return nil
 }
 
-func (m *MTProto) GetDcAddress (dcID int32) string {
+func (m *MTProto) GetDcAddress(dcID int32) string {
 	return m.dclist[dcID]
 }
 

@@ -3,9 +3,9 @@ package mtproto
 import (
 	"fmt"
 	"log"
+
 	"github.com/pkg/errors"
 )
-
 
 func (m *MTProto) Auth_SendCode(phonenumber string) (string, error) {
 	var authSentCode TL_auth_sentCode

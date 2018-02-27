@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	CHAT_TYPE_EMPTY             = "EMPTY"
-	CHAT_TYPE_CHAT              = "CHAT"
-	CHAT_TYPE_CHAT_FORBIDDEN    = "CHAT_FORBIDDEN"
+	CHAT_TYPE_EMPTY          = "EMPTY"
+	CHAT_TYPE_CHAT           = "CHAT"
+	CHAT_TYPE_CHAT_FORBIDDEN = "CHAT_FORBIDDEN"
 )
 
 type ChatProfilePhoto struct {
@@ -130,9 +130,3 @@ func NewChat(input TL) (chat *Chat) {
 	}
 	return chat
 }
-
-
-
-
-
-

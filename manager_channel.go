@@ -300,7 +300,7 @@ func (m *MTProto) Channels_GetFullChannel(channelID int32, accessHash int64) *Ch
 	return channel
 }
 
-func (m *MTProto) Channels_JoinChannel(channelID int32, accessHash int64) {
+func (m *MTProto) Channels_JoinChannel(channelID int32, accessHash int64) error {
 	resp := make(chan TL, 1)
 	m.queueSend <- packetToSend{
 		TL_channels_joinChannel{
@@ -312,15 +312,13 @@ func (m *MTProto) Channels_JoinChannel(channelID int32, accessHash int64) {
 		resp,
 	}
 	x := <-resp
-	//channel := new(Channel)
 	switch input := x.(type) {
 	case TL_rpc_error:
-		log.Println(input.error_message, input.error_code)
+		return fmt.Errorf("TL_rpc_error: %d - %s", input.error_code, input.error_message)
 	default:
-
-		log.Println(reflect.TypeOf(input))
+		// log.Println(reflect.TypeOf(input))
 	}
-	return
+	return nil
 }
 
 func (m *MTProto) Channels_GetMessages(channel TL, ids []int32) []Message {

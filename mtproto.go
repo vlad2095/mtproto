@@ -36,6 +36,8 @@ type MTProto struct {
 	stopPing  chan struct{}
 	allDone   chan struct{}
 
+	Updates chan TL_updates
+
 	authKey     []byte
 	authKeyHash []byte
 	serverSalt  []byte
@@ -125,6 +127,8 @@ func (m *MTProto) Connect() error {
 	}
 
 	// start goroutines
+	m.Updates = make(chan TL_updates, 1024)
+
 	m.queueSend = make(chan packetToSend, 64)
 	m.stopSend = make(chan struct{}, 1)
 	m.stopRead = make(chan struct{}, 1)
@@ -139,7 +143,6 @@ func (m *MTProto) Connect() error {
 	var resp chan TL
 	var x TL
 
-	// (help_getConfig)
 	resp = make(chan TL, 1)
 	m.queueSend <- packetToSend{
 		TL_invokeWithLayer{
@@ -335,6 +338,10 @@ func (m *MTProto) process(msgId int64, seqNo int32, data interface{}) interface{
 		}
 		delete(m.msgsIdToAck, data.req_msg_id)
 		m.mutex.Unlock()
+	case TL_updates:
+		data := data.(TL_updates)
+		m.Updates <- data
+		return data
 	default:
 		return data
 

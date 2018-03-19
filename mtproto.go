@@ -169,7 +169,7 @@ func (m *MTProto) Connect() error {
 			m.dclist[v.Id] = fmt.Sprintf("%s:%d", v.Ip_address, v.Port)
 		}
 	default:
-		return fmt.Errorf("Got: %T", x)
+		return fmt.Errorf("Got: %T, %#v", x, x)
 	}
 
 	// start keepalive pinging
@@ -195,6 +195,7 @@ func (m *MTProto) Disconnect() error {
 
 	// close send queue
 	close(m.queueSend)
+	close(m.Updates)
 
 	<-m.allDone
 	<-m.allDone
@@ -228,6 +229,7 @@ func (m *MTProto) reconnect(newaddr string) error {
 
 	// close send queue
 	close(m.queueSend)
+	close(m.Updates)
 
 	<-m.allDone
 	<-m.allDone

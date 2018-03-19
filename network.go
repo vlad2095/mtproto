@@ -117,6 +117,7 @@ func (m *MTProto) read(stop <-chan struct{}) (interface{}, error) {
 	}
 	if err != nil {
 		log.Println("read 1st byte")
+		log.Printf("%#v", err)
 		return nil, err
 	}
 	if b[0] < 127 {

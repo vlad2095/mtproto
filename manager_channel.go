@@ -321,6 +321,27 @@ func (m *MTProto) Channels_JoinChannel(channelID int32, accessHash int64) error 
 	return nil
 }
 
+func (m *MTProto) Channels_LeaveChannel(channelID int32, accessHash int64) error {
+	resp := make(chan TL, 1)
+	m.queueSend <- packetToSend{
+		TL_channels_leaveChannel{
+			Channel: TL_inputChannel{
+				Channel_id:  channelID,
+				Access_hash: accessHash,
+			},
+		},
+		resp,
+	}
+	x := <-resp
+	switch input := x.(type) {
+	case TL_rpc_error:
+		return fmt.Errorf("TL_rpc_error: %d - %s", input.error_code, input.error_message)
+	default:
+		// log.Println(reflect.TypeOf(input))
+	}
+	return nil
+}
+
 func (m *MTProto) Channels_GetMessages(channel TL, ids []int32) []Message {
 	resp := make(chan TL, 1)
 	m.queueSend <- packetToSend{

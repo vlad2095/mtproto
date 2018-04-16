@@ -45,7 +45,7 @@ func NewContact(in TL) (contact *Contact) {
 	return
 }
 
-func (m *MTProto) Contacts_ResolveUserName(name string) ([]Channel, []User, error) {
+func (m *MTProto) Contacts_ResolveUserName(name string) ([]Channel, []Chat, []User, error) {
 	resp := make(chan TL, 1)
 	m.queueSend <- packetToSend{TL_contacts_resolveUsername{
 		name},
@@ -56,20 +56,20 @@ func (m *MTProto) Contacts_ResolveUserName(name string) ([]Channel, []User, erro
 	peer, ok := x.(TL_contacts_resolvedPeer)
 	if !ok {
 		log.Println(fmt.Sprintf("RPC: %#v", x))
-		return []Channel{}, []User{}, fmt.Errorf("RPC: %#v", x)
+		return []Channel{}, []Chat{}, []User{}, fmt.Errorf("RPC: %#v", x)
 	}
 
-	// TChats := make([]Chat, 0, len(peer.Chats))
+	TChats := make([]Chat, 0, len(peer.Chats))
 	TChannel := make([]Channel, 0, len(peer.Chats))
 	TUsers := make([]User, 0, len(peer.Users))
 
 	for _, v := range peer.Chats {
 		switch v.(type) {
-		// case TL_chatEmpty, TL_chat, TL_chatFull, TL_chatForbidden:
-		// 	TChats = append(
-		// 		TChats,
-		// 		*NewChat(v),
-		// 	)
+		case TL_chatEmpty, TL_chat, TL_chatFull, TL_chatForbidden:
+			TChats = append(
+				TChats,
+				*NewChat(v),
+			)
 		case TL_channel, TL_channelFull, TL_channelForbidden:
 			TChannel = append(
 				TChannel,
@@ -89,7 +89,7 @@ func (m *MTProto) Contacts_ResolveUserName(name string) ([]Channel, []User, erro
 		}
 	}
 
-	return TChannel, TUsers, nil
+	return TChannel, TChats, TUsers, nil
 }
 
 func (m *MTProto) Contacts_GetContacts(hash int32) ([]Contact, []User, error) {

@@ -337,7 +337,7 @@ func (m *MTProto) Messages_ImportChatInvite(hash string) *Chat {
 	return nil
 }
 
-func (m *MTProto) Messages_GetHistory(inputPeer TL, offs_id, offs_date, add_offs, limit, min_id, max_id int32) ([]Message, int32) {
+func (m *MTProto) Messages_GetHistory(inputPeer TL, offs_id, offs_date, add_offs, limit, min_id, max_id int32) ([]Message, int32, error) {
 	resp := make(chan TL, 1)
 	m.queueSend <- packetToSend{
 		TL_messages_getHistory{
@@ -361,7 +361,7 @@ func (m *MTProto) Messages_GetHistory(inputPeer TL, offs_id, offs_date, add_offs
 				messages = append(messages, *msg)
 			}
 		}
-		return messages, int32(len(messages))
+		return messages, int32(len(messages)), nil
 	case TL_messages_messagesSlice:
 		for _, m := range input.Messages {
 			msg := NewMessage(m)
@@ -369,7 +369,7 @@ func (m *MTProto) Messages_GetHistory(inputPeer TL, offs_id, offs_date, add_offs
 				messages = append(messages, *msg)
 			}
 		}
-		return messages, input.Count
+		return messages, input.Count, nil
 	case TL_messages_channelMessages:
 		for _, m := range input.Messages {
 			msg := NewMessage(m)
@@ -377,13 +377,13 @@ func (m *MTProto) Messages_GetHistory(inputPeer TL, offs_id, offs_date, add_offs
 				messages = append(messages, *msg)
 			}
 		}
-		return messages, input.Count
+		return messages, input.Count, nil
 	case TL_rpc_error:
 		fmt.Println(input.error_message, input.error_code)
-		return messages, 0
+		return messages, 0, fmt.Errorf("TL_rpc_error: %d %s", input.error_code, input.error_message)
 	default:
 		fmt.Println(reflect.TypeOf(input).String())
-		return messages, 0
+		return messages, 0, nil
 	}
 
 }

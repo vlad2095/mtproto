@@ -80,7 +80,7 @@ func (m *MTProto) Auth_CheckPhone(phonenumber string) bool {
 	resp := make(chan TL, 1)
 	m.queueSend <- packetToSend{
 		TL_auth_checkPhone{
-			"989121228718",
+			phonenumber,
 		},
 		resp,
 	}

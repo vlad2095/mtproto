@@ -4,7 +4,7 @@ MTProto implementation in Golang with example tool.
 ## install
 
 ```
-$ go get -v -u github.com/ronak/mtproto
+$ go get -v -u github.com/vlad2095/mtproto
 ```
 
 ## Library
